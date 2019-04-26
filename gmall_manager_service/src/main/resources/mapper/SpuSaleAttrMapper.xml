@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wnn.gmall2.manager.mapper.SpuSaleAttrMapper">
+
+    <select id="getSkuSaleAttrValueListBySpu"  resultType="cn.wnn.gmall2.bean.SkuSaleAttrValue">
+        SELECT av.sku_id skuId,av.sale_attr_value_id saleAttrValueId,av.sale_attr_id saleAttrId
+        from sku_sale_attr_value av
+        INNER JOIN  sku_info si
+        on si.id = av.sku_id
+        where si.spu_id= 25
+        order by av.sku_id,av.sale_attr_id,av.sale_attr_value_id
+
+    </select>
+
+
+
+    <select id="selectSpuSaleAttrListCheckBySku" parameterType="map" resultMap="selectSpuSaleAttrListCheckBySkuMap">
+        SELECT
+        sa.id sa_id,sa.spu_id spuId,sa.sale_attr_id saleAttrId ,sa.sale_attr_name saleAttrName,
+        av.id av_id,av.sale_attr_value_name saleAttrValueName,IF(sav.sku_id is NOT NULL,1,0) isChecked
+        from spu_sale_attr sa
+        INNER JOIN spu_sale_attr_value av
+        on sa.sale_attr_id=av.sale_attr_id and sa.spu_id=av.spu_id
+        LEFT JOIN sku_sale_attr_value sav
+        on sav.sale_attr_id = sa.sale_attr_id and sav.sale_attr_value_id=av.id and sav.sku_id=#{skuId}
+        where sa.spu_id= #{spuId}
+        order by sa.sale_attr_id,av.id
+
+    </select>
+
+    <resultMap id="selectSpuSaleAttrListCheckBySkuMap" type="cn.wnn.gmall2.bean.SpuSaleAttr" autoMapping="true">
+        <id property="id" column="sa_id"></id>
+        <collection property="spuSaleAttrValueList" ofType="cn.wnn.gmall2.bean.SpuSaleAttrValue" autoMapping="true">
+            <id property="id"  column="av_id"/>
+        </collection>
+    </resultMap>
+
+    <select  id ="selectSpuSaleAttrList" parameterType="long" resultMap="selectSpuSaleAttrListMap">
+       select sa.id sa_id,sa.spu_id sa_spu_id,sa.sale_attr_id sa_sale_attr_id,sa.sale_attr_name,
+        av.id av_id,av.spu_id av_spu_id ,av.sale_attr_id av_sale_attr_id,av.sale_attr_value_name
+        from spu_sale_attr sa
+        LEFT JOIN spu_sale_attr_value av
+        on sa.id = av.sale_attr_id
+        where sa.spu_id = #{spuId}
+     </select>
+
+    <resultMap id="selectSpuSaleAttrListMap" type="cn.wnn.gmall2.bean.SpuSaleAttr" autoMapping="true">
+        <id property="id" column="sa_id"></id>
+        <result property="spuId" column="sa_spu_id"/>
+        <result property="saleAttrId" column="sa_sale_attr_id"/>
+        <collection property="spuSaleAttrValueList" ofType="cn.wnn.gmall2.bean.SpuSaleAttrValue" autoMapping="true">
+            <id property="id"  column="av_id"/>
+            <result property="spuId" column="av_spu_id"/>
+            <result property="saleAttrId" column="av_sale_attr_id"/>
+        </collection>
+    </resultMap>
+
+</mapper>

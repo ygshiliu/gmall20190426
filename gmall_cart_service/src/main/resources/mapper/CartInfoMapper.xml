@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wnn.gmall2.mapper.CartInfoMapper">
+
+    <select id="getCartWithPrice" resultMap="getCartWithPriceMap">
+        select cart_info.id,user_id,sku_id,cart_price,sku_num,img_url,cart_info.sku_name,sku_info.price
+        from sku_info,cart_info
+        where sku_info.id = cart_info.sku_id
+        and user_id = #{userId}
+    </select>
+    <resultMap id="getCartWithPriceMap" type="cn.wnn.gmall2.bean.CartInfo" autoMapping="true">
+        <id column="id" property="id"/>
+        <result column="price" property="skuPrice"/>
+    </resultMap>
+</mapper>
